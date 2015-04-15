@@ -2,15 +2,22 @@ var express = require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-var path = require('path')
+var path = require('path');
+var StreamListener = require('./StreamListener');
 
 app.use(express.static(path.join(__dirname, '../client')));
 
-io.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
+
+var sockets = [];
+
+StreamListener.start(function (tweet) {
+  sockets.forEach(function (socket) {
+    socket.emit('tweet', tweet);
   });
+});
+
+io.on('connection', function (socket) {
+  sockets.push(socket);
 });
 
 server.listen(3000, function () {
