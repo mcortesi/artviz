@@ -23,9 +23,9 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
   var socket = io.connect('http://localhost:3000');
-  socket.on('tweet', function (tweet) {
+  socket.on('tweet', function (rawTweet) {
     console.log('tweet added');
-    tweetConstelation.addTweet(tweet);
+    tweetConstelation.addTweet(new Tweet(rawTweet));
   });
 </script>
 

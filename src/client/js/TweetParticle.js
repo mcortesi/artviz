@@ -1,3 +1,24 @@
+function randInt(min,max){
+  var range = max - min;
+  // it actually does work the other way...
+  // if (range < 0) { throw new RangeError("min must be less than max"); }
+
+  var rand = Math.floor(Math.random() * (range + 1));
+  return min + rand;
+}
+
+function Tweet(rawTweet) {
+  this.rawTweet = rawTweet;
+}
+
+Tweet.prototype.id = function() {
+  return this.rawTweet.id;
+}
+
+Tweet.prototype.getContentType = function() {
+  return ['text', 'photo', 'video'][randInt(0, 2)];
+}
+
 
 function TweetParticle(tweet, sprite) {
   this._listeners = [];
@@ -8,12 +29,25 @@ function TweetParticle(tweet, sprite) {
   var radiusRange = 100;
   sprite.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
   sprite.position.setLength( radiusRange * (Math.random() * 0.1 + 0.9) );
-  sprite.material.color.setHSL( Math.random(), 0.9, 0.7 );
+  this.setSpriteColor(sprite);
   sprite.visible = true;
 
   this.age = 0;
-  this.maxAge = 3;
+  this.maxAge = 0.1;
 }
+
+TweetParticle.prototype.setSpriteColor = function(sprite) {
+  var hueMap = {
+    'text': 0.1,
+    'photo': 0.5,
+    'video': 0.9
+  }
+
+  var hue = hueMap[this.tweet.getContentType()];
+
+  //sprite.material.color.setHSL( Math.random(), 0.9, 0.7 );
+  sprite.material.color.setHSL(hue, 0.9, 0.7 );
+};
 
 TweetParticle.prototype.update = function(dt) {
   this.age += dt;
@@ -36,7 +70,7 @@ TweetParticle.prototype.trigger = function(eventName) {
 };
 
 function TweetConstelation(scene) {
-  this.maxTweets = 10 * 10;
+  this.maxTweets = 10 * 10; 
 
   this.particleGroup = null;
 
@@ -104,9 +138,12 @@ TweetConstelation.prototype.update = function(dt) {
 
 TweetConstelation.prototype.cleanupExpiredParticleTweets = function() {
   var self = this;
-  this._expiredTweetParticles.forEach(function(tweetParticle) {
-    delete self.tweetParticles[tweetParticle.tweet.id];
-    self.particlesPool.push(tweetParticle.sprite);
-  });
-  this._expiredTweetParticles = [];
+  if(this._expiredTweetParticles.length > 0) {
+    console.log('Cleaning ' + this._expiredTweetParticles.length + ' particles');
+    this._expiredTweetParticles.forEach(function(tweetParticle) {
+      delete self.tweetParticles[tweetParticle.tweet.id()];
+      self.particlesPool.push(tweetParticle.sprite);
+    });
+    this._expiredTweetParticles = [];
+  }
 }
