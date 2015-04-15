@@ -12,7 +12,7 @@ function TweetParticle(tweet, sprite) {
   sprite.visible = true;
 
   this.age = 0;
-  this.maxAge = 6;
+  this.maxAge = 3;
 }
 
 TweetParticle.prototype.update = function(dt) {
@@ -36,7 +36,7 @@ TweetParticle.prototype.trigger = function(eventName) {
 };
 
 function TweetConstelation(scene) {
-  this.maxTweets = 10;
+  this.maxTweets = 10 * 10;
 
   this.particleGroup = null;
 
