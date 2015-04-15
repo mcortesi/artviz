@@ -7,18 +7,13 @@ function randInt(min,max){
   return min + rand;
 }
 
-function Tweet(rawTweet) {
-  this.rawTweet = rawTweet;
+function parseTweet(tweet) {
+  return {
+    id: tweet.id,
+    contentType: ['text', 'photo', 'video'][randInt(0, 2)],
+    original: tweet
+  }
 }
-
-Tweet.prototype.id = function() {
-  return this.rawTweet.id;
-}
-
-Tweet.prototype.getContentType = function() {
-  return ['text', 'photo', 'video'][randInt(0, 2)];
-}
-
 
 function TweetParticle(tweet, sprite) {
   this._listeners = [];
@@ -29,11 +24,15 @@ function TweetParticle(tweet, sprite) {
   var radiusRange = 100;
   sprite.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
   sprite.position.setLength( radiusRange * (Math.random() * 0.1 + 0.9) );
+
+  this.startPosition = sprite.position.clone()
+  this.randomness = Math.random();
+
   this.setSpriteColor(sprite);
   sprite.visible = true;
 
   this.age = 0;
-  this.maxAge = 0.1;
+  this.maxAge = 2;
 }
 
 TweetParticle.prototype.setSpriteColor = function(sprite) {
@@ -43,7 +42,7 @@ TweetParticle.prototype.setSpriteColor = function(sprite) {
     'video': 0.9
   }
 
-  var hue = hueMap[this.tweet.getContentType()];
+  var hue = hueMap[this.tweet.contentType];
 
   //sprite.material.color.setHSL( Math.random(), 0.9, 0.7 );
   sprite.material.color.setHSL(hue, 0.9, 0.7 );
@@ -56,6 +55,13 @@ TweetParticle.prototype.update = function(dt) {
     this.sprite.visible = false;
     this.trigger('expired');
   }
+
+  var time = clock.getElapsedTime(); // TODO remove this.
+  var a = this.randomness + 1;
+  var pulseFactor = Math.sin(a * 4 * time) * 0.1 + 0.9;
+  this.sprite.position.x = this.startPosition.x * pulseFactor;
+  this.sprite.position.y = this.startPosition.y * pulseFactor;
+  this.sprite.position.z = this.startPosition.z * pulseFactor;
 };
 
 TweetParticle.prototype.addListener = function(listener) {
@@ -70,7 +76,7 @@ TweetParticle.prototype.trigger = function(eventName) {
 };
 
 function TweetConstelation(scene) {
-  this.maxTweets = 10 * 10; 
+  this.maxTweets = 100;
 
   this.particleGroup = null;
 
@@ -85,7 +91,7 @@ TweetConstelation.prototype.initParticlesPool = function() {
   for (var i=0; i < this.maxTweets; i++) {
     var spriteMaterial = new THREE.SpriteMaterial( { map: particleTexture, useScreenCoordinates: false, color: 0xff0000 } );
     var sprite = new THREE.Sprite( spriteMaterial );
-    sprite.scale.set( 32, 32, 1.0 ); // imageWidth, imageHeight
+    sprite.scale.set( 32*2, 32*2, 1.0 ); // imageWidth, imageHeight
     sprite.visible = false;
 
     this.particleGroup.add(sprite);
@@ -102,7 +108,7 @@ TweetConstelation.prototype.getFreeParticle = function() {
 TweetConstelation.prototype.addTweet = function(tweet) {
   var sprite = this.getFreeParticle();
   if(sprite) {
-    var tweetParticle = new TweetParticle(tweet, sprite)
+    var tweetParticle = new TweetParticle(parseTweet(tweet), sprite)
     tweetParticle.addListener(this.onExpiredTweetParticle.bind(this));
     this.tweetParticles[tweet.id] = tweetParticle;
   } else {
@@ -124,24 +130,21 @@ TweetConstelation.prototype.initialize = function() {
 }
 
 TweetConstelation.prototype.update = function(dt) {
-  var self = this;
-
   this.particleGroup.rotation.y += dt * 0.75;
 
-  for(var tweetId in this.tweetParticles) {
-    this.tweetParticles[tweetId].update(dt);
-  }
+  _.forEach(this.tweetParticles, function(tweetParticle) {
+    tweetParticle.update(dt);
+  });
 
   this.cleanupExpiredParticleTweets();
-
 };
 
 TweetConstelation.prototype.cleanupExpiredParticleTweets = function() {
   var self = this;
-  if(this._expiredTweetParticles.length > 0) {
-    console.log('Cleaning ' + this._expiredTweetParticles.length + ' particles');
+  if (this._expiredTweetParticles.length > 0) {
+
     this._expiredTweetParticles.forEach(function(tweetParticle) {
-      delete self.tweetParticles[tweetParticle.tweet.id()];
+      delete self.tweetParticles[tweetParticle.tweet.id];
       self.particlesPool.push(tweetParticle.sprite);
     });
     this._expiredTweetParticles = [];

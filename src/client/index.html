@@ -8,6 +8,8 @@
 </head>
 <body style='background-color: #000000'>
 
+<script src="bower/lodash/lodash.min.js"></script>
+<script src="bower/immutable/dist/immutable.min.js"></script>
 <script src="js/Three.js"></script>
 <script src="js/Detector.js"></script>
 <script src="js/Stats.js"></script>
@@ -23,9 +25,9 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
   var socket = io.connect('http://localhost:3000');
-  socket.on('tweet', function (rawTweet) {
+  socket.on('tweet', function (tweet) {
     console.log('tweet added');
-    tweetConstelation.addTweet(new Tweet(rawTweet));
+    tweetConstelation.addTweet(tweet);
   });
 </script>
 

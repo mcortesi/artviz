@@ -1,6 +1,7 @@
 .idea
 src/server/twitter-credentials.json
 config/local-development.js
+src/client/bower
 
 # Logs
 logs

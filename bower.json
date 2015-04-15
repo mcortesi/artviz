@@ -13,5 +13,9 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "lodash": "~3.6.0",
+    "immutable": "~3.7.2"
+  }
 }
