@@ -1,13 +1,14 @@
 'use strict';
 
 var Twit = require('twit');
+var config = require('config');
 
-var credentials = require('./twitter-credentials.json');
+var credentials = config.credentials;
 var twit = new Twit(credentials);
 
 function start(onTweet) {
   var stream = twit.stream('statuses/filter', {
-    track: ['#love', '#hate']
+    track: config.streamTrack
   })
 
   stream.on('tweet', function (tweet) {

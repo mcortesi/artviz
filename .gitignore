@@ -1,5 +1,6 @@
 .idea
 src/server/twitter-credentials.json
+config/local-development.js
 
 # Logs
 logs
