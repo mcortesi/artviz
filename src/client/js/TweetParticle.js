@@ -11,9 +11,11 @@ function parseTweet(tweet) {
   return {
     id: tweet.id,
     contentType: ['text', 'photo', 'video'][randInt(0, 2)],
+    is_retweet: tweet.retweeted_status !== undefined,
     original: tweet
   }
 }
+
 
 function TweetParticle(tweet, sprite) {
   this._listeners = [];
@@ -43,6 +45,8 @@ TweetParticle.prototype.setSpriteColor = function(sprite) {
   }
 
   var hue = hueMap[this.tweet.contentType];
+
+  hue = this.tweet.is_retweet? 0.5 : 0.9;
 
   //sprite.material.color.setHSL( Math.random(), 0.9, 0.7 );
   sprite.material.color.setHSL(hue, 0.9, 0.7 );

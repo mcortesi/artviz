@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  streamTrack: [ '#love', '#hate', 'love', 'hate'],
+  streamTrack: [ '#love', "#hate", "love", "hate"],
   credentials: {
     "consumer_key": "",
     "consumer_secret": "",
