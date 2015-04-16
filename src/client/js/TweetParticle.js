@@ -23,6 +23,7 @@ function TweetParticle(tweet, sprite) {
   this._listeners = [];
 
   this.tweet = tweet;
+  this.retweetCount = 0;
   this.sprite = sprite;
 
   var radiusRange = 100;
@@ -33,7 +34,7 @@ function TweetParticle(tweet, sprite) {
   this.randomness = Math.random();
 
   this.setSpriteColor(sprite);
-  this.scale = 32 * 2;
+  this.computeScale();
 
   sprite.scale.set(this.scale, this.scale, 1.0 ); // imageWidth, imageHeight
   sprite.visible = true;
@@ -86,11 +87,20 @@ TweetParticle.prototype.trigger = function(eventName) {
   })
 };
 
+
+
 TweetParticle.prototype.addRetweet = function(retweet) {
+  this.retweetCount++;
   this.maxAge += 0.1;
-  this.scale *= 2;
+  this.computeScale()
 
 };
+
+var sizeScale = d3.scale.sqrt().domain([0, 10]).range([32*2, 32*4])
+
+TweetParticle.prototype.computeScale = function() {
+  this.scale = sizeScale(this.retweetCount);
+}
 
 function TweetConstelation(scene) {
   this.maxTweets = 100;
