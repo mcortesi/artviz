@@ -95,7 +95,9 @@ TweetParticle.prototype.setSpriteColor = function(sprite) {
   //hue = this.tweet.is_retweet? 0.5 : 0.9;
 
   //sprite.material.color.setHSL( Math.random(), 0.9, 0.7 );
+  //sprite.opacity = 0.10; // translucent particles color
   sprite.material.color.setHSL(hue, 0.9, 0.7 );
+  //sprite.material.NoColor; 
 };
 
 TweetParticle.prototype.update = function(dt) {
@@ -144,7 +146,7 @@ function TweetConstelation(scene) {
 }
 
 TweetConstelation.prototype.initParticlesPool = function() {
-  var particleTexture = THREE.ImageUtils.loadTexture( 'images/spark.png' );
+  var particleTexture = THREE.ImageUtils.loadTexture( 'images/spark-02.svg' );
 
   this.particleGroup = new THREE.Object3D();
   this.particlesPool = [];
