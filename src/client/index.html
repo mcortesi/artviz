@@ -24,23 +24,15 @@
 <script src="js/Stats.js"></script>
 <script src="js/OrbitControls.js"></script>
 <script src="js/THREEx.FullScreen.js"></script>
-
+<script src="/socket.io/socket.io.js"></script>
 
 <div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
 
 <script src="/js/TweetParticle.js"></script>
+<script src="/js/scene.js"></script>
 <script src="/js/main.js"></script>
-<script src="/socket.io/socket.io.js"></script>
 
 
-
-<script>
-  var socket = io.connect('http://localhost:3000');
-  socket.on('tweet', function (tweet) {
-    console.log('tweet added');
-    tweetConstelation.addTweet(tweet);
-  });
-</script>
 
 </body>
 </html>

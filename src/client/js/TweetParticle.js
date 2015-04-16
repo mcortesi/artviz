@@ -1,11 +1,3 @@
-var DEBUG_ENABLED = false;
-
-function debug() {
-  if (DEBUG_ENABLED) {
-    console.log.apply(console, arguments);
-  }
-}
-
 var Parameters =  {
   MaxSupportedTPS: 100,
   textHue: 0.1,
