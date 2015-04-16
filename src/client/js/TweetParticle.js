@@ -44,6 +44,49 @@ var TweetConstellation = (function() {
       return contentType;
   }
 
+  var sizeScale = d3.scale.sqrt().domain([0, 10]).range([32*2, 32*4]);
+
+  var TweenFactory = {
+    onEnterTweet: function (sprite) {
+      function updateSprite() {
+        var imageSize = sizeScale(this.scale);
+        sprite.material.opacity = this.opacity;
+        sprite.scale.set(imageSize, imageSize, 1.0 ); // imageWidth, imageHeight
+        sprite.material.needsUpdate = true;
+      }
+
+      return new TWEEN.Tween({opacity: 0, scale: 0})
+        .to({opacity: 1, scale: 1 }, Parameters.ParticleEnterTime)
+        .easing(TWEEN.Easing.Exponential.In)
+        .onUpdate(updateSprite);
+    },
+    onLeaveTweet: function (sprite) {
+      function updateSprite() {
+        sprite.material.opacity = this.opacity;
+        sprite.material.needsUpdate = true;
+      }
+
+      return new TWEEN.Tween({ opacity: sprite.material.opacity })
+        .to({opacity: 0}, Parameters.ParticleLeaveTime)
+        .easing(TWEEN.Easing.Exponential.Out)
+        .onUpdate(updateSprite);
+    },
+    onRetweet: function(sprite, retweetsCount) {
+      var fromSize = sizeScale(retweetsCount -1);
+      var toSize = sizeScale(retweetsCount);
+
+      function updateSprite() {
+        sprite.scale.set(this.imageSize, this.imageSize, 1.0 ); // imageWidth, imageHeight
+      }
+
+      return new TWEEN.Tween({imageSize: fromSize})
+        .to({imageSize: toSize }, 0.5)
+        .easing(TWEEN.Easing.Exponential.In)
+        .onUpdate(updateSprite);
+    }
+
+  };
+
   function TweetParticle(tweet, sprite) {
     this._listeners = [];
 
@@ -59,14 +102,12 @@ var TweetConstellation = (function() {
 
     this.setTexture(sprite);
     this.setSpriteColor(sprite);
-    this.computeScale();
 
-    sprite.scale.set(this.scale, this.scale, 1.0 ); // imageWidth, imageHeight
     sprite.visible = true;
 
     this.age = 0;
     this.maxAge = Parameters.TweetLife;
-    this.opacityTween = new TWEEN.Tween(sprite.material).to({ opacity: 0 }, 1).delay(Parameters.TweetLife - 1).start(0);
+    this.currentAction = TweenFactory.onEnterTweet(sprite).start(0);
   }
 
   TweetParticle.prototype.setTexture = function(sprite) {
@@ -76,25 +117,13 @@ var TweetConstellation = (function() {
   };
 
   TweetParticle.prototype.setSpriteColor = function(sprite) {
-    // var hueMap = {
-    //   'text': Parameters.textHue,
-    //   'photo': Parameters.photoHue,
-    //   'video': Parameters.videoHue
-    // };
-
-    //var hue = hueMap[this.tweet.contentType];
-    //hue = this.tweet.is_retweet? 0.5 : 0.9;
-
-    sprite.material.opacity = Math.random(); // translucent particles color
     sprite.material.color.setHSL(Math.random(), 0.9, 0.8 );
   };
 
   TweetParticle.prototype.update = function(dt) {
     this.age += dt;
 
-    this.sprite.scale.set(this.scale, this.scale, 1.0 ); // imageWidth, imageHeight
-    this.opacityTween.update(this.age);
-    this.sprite.material.needsUpdate = true;
+    this.currentAction.update(this.age);
 
     var a = this.randomness + 1;
     var pulseFactor = Math.sin(a * Parameters.PulseFactor * this.age) * 0.1 + 0.9;
@@ -102,8 +131,15 @@ var TweetConstellation = (function() {
     this.sprite.position.y = this.startPosition.y * pulseFactor;
     this.sprite.position.z = this.startPosition.z * pulseFactor;
 
-    if (this.age >= this.maxAge) {
-      this.sprite.visible = false;
+    if (this.age >= this.maxAge - Parameters.ParticleLeaveTime && !this.dying) {
+      this.dying = true;
+      var sprite = this.sprite;
+      this.currentAction.stop();
+      this.currentAction = TweenFactory.onLeaveTweet(this.sprite)
+        .onComplete(function () {
+          sprite.visible = false;
+        })
+        .start(this.age);
     }
     return this.age >= this.maxAge;
   };
@@ -111,15 +147,21 @@ var TweetConstellation = (function() {
   TweetParticle.prototype.addRetweet = function(retweet) {
     this.retweetCount++;
     this.maxAge += Parameters.RTAgeIncrease;
-    this.computeScale()
 
+    this.sprite.material.color.setHSL(Math.random(), 0.9, 0.8 )
+
+    console.log('new retweet');
+    if (this.dying) {
+      console.log('dying stopped');
+      this.currentAction.stop();
+      this.currentAction = TweenFactory.onRetweet(this.sprite, this.retweetCount);
+      this.dying = false;
+    } else {
+      this.currentAction.chain(TweenFactory.onRetweet(this.sprite, this.retweetCount));
+    }
   };
 
-  var sizeScale = d3.scale.sqrt().domain([0, 10]).range([32*2, 32*4])
 
-  TweetParticle.prototype.computeScale = function() {
-    this.scale = sizeScale(this.retweetCount);
-  };
 
   TweetParticle.prototype.toString = function() {
     return "{tweet: " + this.tweet.id + " , retweets: " + this.retweetCount + ",age: " + this.age + ", maxAge: " + this.maxAge + "}";
@@ -127,7 +169,7 @@ var TweetConstellation = (function() {
 
   function TweetConstellation(scene) {
     this.maxTweets = Parameters.MaxSupportedTPS * Parameters.TweetLife;
-
+    //this.maxTweets = 2;
     this.particleGroup = null;
     this.scene = scene;
   }
@@ -179,12 +221,12 @@ var TweetConstellation = (function() {
     var parse = ('isRetweet' in tweet)? parseAugmentedTweet : parseRawTweet;
 
     return parse(tweet);
-  }
+  };
 
   TweetConstellation.prototype.initialize = function() {
     this.initParticlesPool();
     this.tweetParticles = {};
-  }
+  };
 
   TweetConstellation.prototype.update = function(dt) {
     this.particleGroup.rotation.y += dt * Parameters.RotationSpeed;

@@ -39,6 +39,8 @@ var Parameters =  {
   PulseFactor: 1,
   RTAgeIncrease: 0.5,
   RotationSpeed: 0.5,
+  ParticleEnterTime: 1,
+  ParticleLeaveTime: 0.5,
   explode: function() {alert("hola")}
 };
 
@@ -56,6 +58,8 @@ window.onload = function() {
   gui.add(Parameters, 'PulseFactor', 1, 10);
   gui.add(Parameters, 'RTAgeIncrease');
   gui.add(Parameters, 'RotationSpeed');
+  gui.add(Parameters, 'ParticleEnterTime', 0.2, 2);
+  gui.add(Parameters, 'ParticleLeaveTime', 0.5, 2);
   gui.add(Parameters, 'explode');
 };
 
