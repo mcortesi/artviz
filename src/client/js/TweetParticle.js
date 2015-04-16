@@ -13,6 +13,9 @@ var Parameters =  {
   videoHue: 0.9,
   TweetLife: 6, //seconds
   SphereRadius: 100,
+  PulseFactor: 4,
+  RTAgeIncrease: 0.5,
+  RotationSpeed: 0.75,
   explode: function() {alert("hola")}
 };
 
@@ -26,6 +29,11 @@ window.onload = function() {
   gui.add(Parameters, 'videoHue', 0, 1);
   gui.add(Parameters, 'TweetLife');
   gui.add(Parameters, 'SphereRadius');
+  gui.add(Parameters, 'PulseFactor', 1, 10);
+  gui.add(Parameters, 'RTAgeIncrease');
+  gui.add(Parameters, 'RotationSpeed');
+
+
   gui.add(Parameters, 'explode');
 
 
@@ -96,7 +104,7 @@ TweetParticle.prototype.update = function(dt) {
   this.sprite.scale.set(this.scale, this.scale, 1.0 ); // imageWidth, imageHeight
 
   var a = this.randomness + 1;
-  var pulseFactor = Math.sin(a * 4 * this.age) * 0.1 + 0.9;
+  var pulseFactor = Math.sin(a * Parameters.PulseFactor * this.age) * 0.1 + 0.9;
   this.sprite.position.x = this.startPosition.x * pulseFactor;
   this.sprite.position.y = this.startPosition.y * pulseFactor;
   this.sprite.position.z = this.startPosition.z * pulseFactor;
@@ -112,7 +120,7 @@ TweetParticle.prototype.update = function(dt) {
 
 TweetParticle.prototype.addRetweet = function(retweet) {
   this.retweetCount++;
-  this.maxAge += 0.5;
+  this.maxAge += Parameters.RTAgeIncrease;
   this.computeScale()
 
 };
@@ -179,7 +187,7 @@ TweetConstelation.prototype.initialize = function() {
 }
 
 TweetConstelation.prototype.update = function(dt) {
-  this.particleGroup.rotation.y += dt * 0.75;
+  this.particleGroup.rotation.y += dt * Parameters.RotationSpeed;
 
   var deadTweetIds = _(this.tweetParticles)
     .mapValues(function (tweetParticle) { return tweetParticle.update(dt); })
