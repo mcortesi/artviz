@@ -76,7 +76,7 @@ var Scene = (function () {
   }
 
   function createTweetConstellation(scene) {
-    var tweetConstelation = new TweetConstelation(scene);
+    var tweetConstelation = new TweetConstellation(scene);
     tweetConstelation.initialize();
     return tweetConstelation;
   }
