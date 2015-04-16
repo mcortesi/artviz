@@ -10,7 +10,18 @@ var TweetConstellation = (function() {
     return min + rand;
   }
 
-  function parseTweet(tweet) {
+  function parseAugmentedTweet(tweet) {
+    return {
+      id: tweet.id,
+      contentType: getContentType(tweet),
+      is_retweet: tweet.isRetweet,
+      original_id: (tweet.isRetweet) ? tweet.original.id : null,
+      retweeted_status: tweet.original,
+      raw: tweet
+    };
+  }
+
+  function parseRawTweet(tweet) {
     return {
       id: tweet.id_str,
       contentType: ['text', 'photo', 'video'][randInt(0, 2)],
@@ -19,6 +30,18 @@ var TweetConstellation = (function() {
       retweeted_status: tweet.retweeted_status,
       original: tweet
     };
+  }
+
+  function getContentType(tweet) {
+      var contentType = 'text';
+
+      if(tweet.hasVideos) {
+        contentType = 'video';
+      } else if(tweet.hasImages) {
+        contentType = 'photo';
+      }
+
+      return contentType;
   }
 
   function TweetParticle(tweet, sprite) {
@@ -136,7 +159,7 @@ var TweetConstellation = (function() {
   };
 
   TweetConstellation.prototype.addTweet = function(tweet) {
-    var parsedTweet = parseTweet(tweet);
+    var parsedTweet = this.parseTweet(tweet);
 
     if(!parsedTweet.is_retweet) {
       var sprite = this.getFreeParticle();
@@ -151,6 +174,13 @@ var TweetConstellation = (function() {
       this.addTweet(parsedTweet.retweeted_status);
     }
   };
+
+  TweetConstellation.prototype.parseTweet = function(tweet) {
+    var parse = ('isRetweet' in tweet)? parseAugmentedTweet : parseRawTweet;
+    console.log(parse);
+
+    return parse(tweet);
+  }
 
   TweetConstellation.prototype.initialize = function() {
     this.initParticlesPool();
