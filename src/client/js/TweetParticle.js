@@ -2,7 +2,6 @@ var TweetConstellation = (function() {
   'use strict';
 
   function randInt(min,max){
-
     var range = max - min;
     // it actually does work the other way...
     // if (range < 0) { throw new RangeError("min must be less than max"); }
@@ -19,7 +18,7 @@ var TweetConstellation = (function() {
       original_id: (tweet.retweeted_status !== undefined) ? tweet.retweeted_status.id_str : null,
       retweeted_status: tweet.retweeted_status,
       original: tweet
-    }
+    };
   }
 
   function TweetParticle(tweet, sprite) {
@@ -51,14 +50,14 @@ var TweetConstellation = (function() {
 
     sprite.material.map = texture;
     sprite.material.needsUpdate = true;
-  }
+  };
 
   TweetParticle.prototype.setSpriteColor = function(sprite) {
     var hueMap = {
       'text': Parameters.textHue,
       'photo': Parameters.photoHue,
       'video': Parameters.videoHue
-    }
+    };
 
     var hue = hueMap[this.tweet.contentType];
 
@@ -88,8 +87,6 @@ var TweetConstellation = (function() {
     return this.age >= this.maxAge;
   };
 
-
-
   TweetParticle.prototype.addRetweet = function(retweet) {
     this.retweetCount++;
     this.maxAge += Parameters.RTAgeIncrease;
@@ -101,11 +98,11 @@ var TweetConstellation = (function() {
 
   TweetParticle.prototype.computeScale = function() {
     this.scale = sizeScale(this.retweetCount);
-  }
+  };
 
   TweetParticle.prototype.toString = function() {
     return "{tweet: " + this.tweet.id + " , retweets: " + this.retweetCount + ",age: " + this.age + ", maxAge: " + this.maxAge + "}";
-  }
+  };
 
   function TweetConstellation(scene) {
     this.maxTweets = Parameters.MaxSupportedTPS * Parameters.TweetLife;
@@ -120,7 +117,7 @@ var TweetConstellation = (function() {
     'text': THREE.ImageUtils.loadTexture( 'images/spark-01.svg' ),
     'photo': THREE.ImageUtils.loadTexture( 'images/spark-02.svg' ),
     'video': THREE.ImageUtils.loadTexture( 'images/spark-03.svg' )
-  }
+  };
 
   TweetConstellation.prototype.initParticlesPool = function() {
     this.particleGroup = new THREE.Object3D();
@@ -135,26 +132,26 @@ var TweetConstellation = (function() {
     }
     this.particleGroup.position.y = 100;
     this.scene.add(this.particleGroup);
-  }
+  };
 
   TweetConstellation.prototype.getFreeParticle = function() {
     return this.particlesPool.pop();
-  }
+  };
 
   TweetConstellation.prototype.addTweet = function(tweet) {
-    var tweet = parseTweet(tweet);
+    var parsedTweet = parseTweet(tweet);
 
-    if(!tweet.is_retweet) {
+    if(!parsedTweet.is_retweet) {
       var sprite = this.getFreeParticle();
       if(sprite) {
-        this.tweetParticles[tweet.id] = new TweetParticle(tweet, sprite);
+        this.tweetParticles[parsedTweet.id] = new TweetParticle(parsedTweet, sprite);
       } else {
-        console.log('Particle Pool Exhausted');
+        debug('Particle Pool Exhausted');
       }
-    } else if (this.tweetParticles[tweet.original_id]) {
-      this.tweetParticles[tweet.original_id].addRetweet(tweet);
+    } else if (this.tweetParticles[parsedTweet.original_id]) {
+      this.tweetParticles[parsedTweet.original_id].addRetweet(parsedTweet);
     } else {
-      this.addTweet(tweet.retweeted_status)
+      this.addTweet(parsedTweet.retweeted_status);
     }
   };
 
