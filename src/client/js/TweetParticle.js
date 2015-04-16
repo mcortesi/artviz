@@ -52,10 +52,6 @@ var TweetConstellation = (function() {
     sprite.material.map = texture;
     sprite.material.needsUpdate = true;
 
-    //sprite.material.color.setHSL( Math.random(), 0.9, 0.7 );
-    sprite.material.opacity = Math.random(); // translucent particles color
-    sprite.material.color.setHSL(Math.random(), 0.9, 0.8 );
-    //sprite.material.NoColor;
   };
 
   TweetParticle.prototype.setSpriteColor = function(sprite) {
@@ -70,8 +66,8 @@ var TweetConstellation = (function() {
     //hue = this.tweet.is_retweet? 0.5 : 0.9;
 
     //sprite.material.color.setHSL( Math.random(), 0.9, 0.7 );
-    sprite.opacity = 0.50; // translucent particles color
-    sprite.material.color.setHSL(hue, 0.9, 0.7 );
+    sprite.material.opacity = Math.random(); // translucent particles color
+    sprite.material.color.setHSL(Math.random(), 0.9, 0.8 );
     //sprite.material.NoColor;
   };
 
