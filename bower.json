@@ -19,6 +19,14 @@
     "immutable": "~3.7.2",
     "d3": "~3.5.5",
     "moment": "~2.10.2",
-    "dat-gui": "~0.5.1"
+    "dat-gui": "~0.5.1",
+    "tweenjs": "*",
+    "threex.keyboardstate": "*",
+    "threex.windowresize": "*"
+  },
+  "overrides": {
+    "dat-gui": {
+      "main": "build/dat.gui.min.js"
+    }
   }
 }
