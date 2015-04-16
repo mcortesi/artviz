@@ -48,8 +48,14 @@ var TweetConstellation = (function() {
   TweetParticle.prototype.setTexture = function(sprite) {
     var texture = Textures[this.tweet.contentType];
 
+
     sprite.material.map = texture;
     sprite.material.needsUpdate = true;
+
+    //sprite.material.color.setHSL( Math.random(), 0.9, 0.7 );
+    sprite.material.opacity = Math.random(); // translucent particles color
+    sprite.material.color.setHSL(Math.random(), 0.9, 0.8 );
+    //sprite.material.NoColor;
   };
 
   TweetParticle.prototype.setSpriteColor = function(sprite) {
@@ -108,7 +114,6 @@ var TweetConstellation = (function() {
     this.maxTweets = Parameters.MaxSupportedTPS * Parameters.TweetLife;
 
     this.particleGroup = null;
-
     this.scene = scene;
   }
 
@@ -123,7 +128,7 @@ var TweetConstellation = (function() {
     this.particleGroup = new THREE.Object3D();
     this.particlesPool = [];
     for (var i=0; i < this.maxTweets; i++) {
-      var spriteMaterial = new THREE.SpriteMaterial( { map: Textures['text'], useScreenCoordinates: false, color: 0xff0000 } );
+      var spriteMaterial = new THREE.SpriteMaterial( { map: Textures['text'], useScreenCoordinates: false, color: 0xff0000, transparent: true, opacity: 0.5} );
       var sprite = new THREE.Sprite( spriteMaterial );
       sprite.visible = false;
 
