@@ -55,13 +55,13 @@ var TweetConstellation = (function() {
   };
 
   TweetParticle.prototype.setSpriteColor = function(sprite) {
-    var hueMap = {
-      'text': Parameters.textHue,
-      'photo': Parameters.photoHue,
-      'video': Parameters.videoHue
-    };
+    // var hueMap = {
+    //   'text': Parameters.textHue,
+    //   'photo': Parameters.photoHue,
+    //   'video': Parameters.videoHue
+    // };
 
-    var hue = hueMap[this.tweet.contentType];
+    //var hue = hueMap[this.tweet.contentType];
 
     //hue = this.tweet.is_retweet? 0.5 : 0.9;
 
@@ -124,7 +124,7 @@ var TweetConstellation = (function() {
     this.particleGroup = new THREE.Object3D();
     this.particlesPool = [];
     for (var i=0; i < this.maxTweets; i++) {
-      var spriteMaterial = new THREE.SpriteMaterial( { map: Textures['text'], useScreenCoordinates: false, color: 0xff0000, transparent: true, opacity: 0.5} );
+      var spriteMaterial = new THREE.SpriteMaterial( { map: Textures['null'], useScreenCoordinates: false, color: 0xff0000, transparent: true, opacity: 0.5} );
       var sprite = new THREE.Sprite( spriteMaterial );
       sprite.visible = false;
 
