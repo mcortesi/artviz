@@ -123,11 +123,17 @@ var TweetConstellation = (function() {
   TweetConstellation.prototype.initParticlesPool = function() {
     this.particleGroup = new THREE.Object3D();
     this.particlesPool = [];
-    for (var i=0; i < this.maxTweets; i++) {
-      var spriteMaterial = new THREE.SpriteMaterial( { map: Textures['null'], useScreenCoordinates: false, color: 0xff0000, transparent: true, opacity: 0.5} );
-      var sprite = new THREE.Sprite( spriteMaterial );
-      sprite.visible = false;
+    // Using wireframe materials to illustrate shape details.
 
+    for (var i=0; i < this.maxTweets; i++) {
+      var darkMaterial = new THREE.MeshBasicMaterial( { color: 0xffffcc } );
+      var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } ); 
+      var multiMaterial = [ darkMaterial, wireframeMaterial ];
+      //var spriteMaterial = new THREE.SpriteMaterial( { map: Textures['null'], useScreenCoordinates: false, color: 0xff0000, transparent: true, opacity: 0.5} );
+      var sprite = THREE.SceneUtils.createMultiMaterialObject( 
+        new THREE.CubeGeometry(100, 100, 100, 1, 1, 1), 
+        multiMaterial );
+      sprite.visible = true;
       this.particleGroup.add(sprite);
       this.particlesPool.push(sprite);
     }
