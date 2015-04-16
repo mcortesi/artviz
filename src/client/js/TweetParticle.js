@@ -9,9 +9,11 @@ function randInt(min,max){
 
 function parseTweet(tweet) {
   return {
-    id: tweet.id,
+    id: tweet.id_str,
     contentType: ['text', 'photo', 'video'][randInt(0, 2)],
     is_retweet: tweet.retweeted_status !== undefined,
+    original_id: (tweet.retweeted_status !== undefined) ? tweet.retweeted_status.id_str : null,
+    retweeted_status: tweet.retweeted_status,
     original: tweet
   }
 }
@@ -31,6 +33,9 @@ function TweetParticle(tweet, sprite) {
   this.randomness = Math.random();
 
   this.setSpriteColor(sprite);
+  this.scale = 32 * 2;
+
+  sprite.scale.set(this.scale, this.scale, 1.0 ); // imageWidth, imageHeight
   sprite.visible = true;
 
   this.age = 0;
@@ -79,6 +84,11 @@ TweetParticle.prototype.trigger = function(eventName) {
   })
 };
 
+TweetParticle.prototype.addRetweet = function(retweet) {
+  this.maxAge += 0.1;
+
+};
+
 function TweetConstelation(scene) {
   this.maxTweets = 100;
 
@@ -95,7 +105,6 @@ TweetConstelation.prototype.initParticlesPool = function() {
   for (var i=0; i < this.maxTweets; i++) {
     var spriteMaterial = new THREE.SpriteMaterial( { map: particleTexture, useScreenCoordinates: false, color: 0xff0000 } );
     var sprite = new THREE.Sprite( spriteMaterial );
-    sprite.scale.set( 32*2, 32*2, 1.0 ); // imageWidth, imageHeight
     sprite.visible = false;
 
     this.particleGroup.add(sprite);
@@ -110,13 +119,21 @@ TweetConstelation.prototype.getFreeParticle = function() {
 }
 
 TweetConstelation.prototype.addTweet = function(tweet) {
-  var sprite = this.getFreeParticle();
-  if(sprite) {
-    var tweetParticle = new TweetParticle(parseTweet(tweet), sprite)
-    tweetParticle.addListener(this.onExpiredTweetParticle.bind(this));
-    this.tweetParticles[tweet.id] = tweetParticle;
+  var tweet = parseTweet(tweet);
+
+  if(!tweet.is_retweet) {
+    var sprite = this.getFreeParticle();
+    if(sprite) {
+      var tweetParticle = new TweetParticle(tweet, sprite)
+      tweetParticle.addListener(this.onExpiredTweetParticle.bind(this));
+      this.tweetParticles[tweet.id] = tweetParticle;
+    } else {
+      console.log('Particle Pool Exhausted');
+    }
+  } else if(this.tweetParticles[tweet.original_id]) {
+    this.tweetParticles[tweet.original_id].addRetweet(tweet);
   } else {
-    console.log('Particle Pool Exhausted');
+    this.addTweet(tweet.retweeted_status)
   }
 };
 
