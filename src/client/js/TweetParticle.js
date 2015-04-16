@@ -73,6 +73,7 @@ function TweetParticle(tweet, sprite) {
   this.startPosition = sprite.position.clone()
   this.randomness = Math.random();
 
+  this.setTexture(sprite);
   this.setSpriteColor(sprite);
   this.computeScale();
 
@@ -81,6 +82,13 @@ function TweetParticle(tweet, sprite) {
 
   this.age = 0;
   this.maxAge = Parameters.TweetLife;
+}
+
+TweetParticle.prototype.setTexture = function(sprite) {
+  var texture = Textures[this.tweet.contentType];
+
+  sprite.material.map = texture;
+  sprite.material.needsUpdate = true;
 }
 
 TweetParticle.prototype.setSpriteColor = function(sprite) {
@@ -97,7 +105,7 @@ TweetParticle.prototype.setSpriteColor = function(sprite) {
   //sprite.material.color.setHSL( Math.random(), 0.9, 0.7 );
   //sprite.opacity = 0.10; // translucent particles color
   sprite.material.color.setHSL(hue, 0.9, 0.7 );
-  //sprite.material.NoColor; 
+  //sprite.material.NoColor;
 };
 
 TweetParticle.prototype.update = function(dt) {
@@ -145,13 +153,18 @@ function TweetConstelation(scene) {
   this.scene = scene;
 }
 
-TweetConstelation.prototype.initParticlesPool = function() {
-  var particleTexture = THREE.ImageUtils.loadTexture( 'images/spark-02.svg' );
 
+var Textures = {
+  'text': THREE.ImageUtils.loadTexture( 'images/spark-01.svg' ),
+  'photo': THREE.ImageUtils.loadTexture( 'images/spark-02.svg' ),
+  'video': THREE.ImageUtils.loadTexture( 'images/spark-03.svg' )
+}
+
+TweetConstelation.prototype.initParticlesPool = function() {
   this.particleGroup = new THREE.Object3D();
   this.particlesPool = [];
   for (var i=0; i < this.maxTweets; i++) {
-    var spriteMaterial = new THREE.SpriteMaterial( { map: particleTexture, useScreenCoordinates: false, color: 0xff0000 } );
+    var spriteMaterial = new THREE.SpriteMaterial( { map: Textures['text'], useScreenCoordinates: false, color: 0xff0000 } );
     var sprite = new THREE.Sprite( spriteMaterial );
     sprite.visible = false;
 
