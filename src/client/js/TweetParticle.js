@@ -51,7 +51,7 @@ TweetParticle.prototype.setSpriteColor = function(sprite) {
 
   var hue = hueMap[this.tweet.contentType];
 
-  hue = this.tweet.is_retweet? 0.5 : 0.9;
+  //hue = this.tweet.is_retweet? 0.5 : 0.9;
 
   //sprite.material.color.setHSL( Math.random(), 0.9, 0.7 );
   sprite.material.color.setHSL(hue, 0.9, 0.7 );
@@ -64,6 +64,8 @@ TweetParticle.prototype.update = function(dt) {
     this.sprite.visible = false;
     this.trigger('expired');
   }
+
+  this.sprite.scale.set(this.scale, this.scale, 1.0 ); // imageWidth, imageHeight
 
   var time = clock.getElapsedTime(); // TODO remove this.
   var a = this.randomness + 1;
@@ -86,6 +88,7 @@ TweetParticle.prototype.trigger = function(eventName) {
 
 TweetParticle.prototype.addRetweet = function(retweet) {
   this.maxAge += 0.1;
+  this.scale *= 2;
 
 };
 
