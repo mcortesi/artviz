@@ -1,4 +1,4 @@
-var DEBUG_ENABLED = true;
+var DEBUG_ENABLED = false;
 
 function debug() {
   if (DEBUG_ENABLED) {
