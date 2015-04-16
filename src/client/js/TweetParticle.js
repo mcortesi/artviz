@@ -12,10 +12,10 @@ var Parameters =  {
   photoHue: 0.5,
   videoHue: 0.9,
   TweetLife: 6, //seconds
-  SphereRadius: 100,
-  PulseFactor: 4,
+  SphereRadius: 600,
+  PulseFactor: 1,
   RTAgeIncrease: 0.5,
-  RotationSpeed: 0.75,
+  RotationSpeed: 0.5,
   explode: function() {alert("hola")}
 };
 
@@ -103,7 +103,7 @@ TweetParticle.prototype.setSpriteColor = function(sprite) {
   //hue = this.tweet.is_retweet? 0.5 : 0.9;
 
   //sprite.material.color.setHSL( Math.random(), 0.9, 0.7 );
-  //sprite.opacity = 0.10; // translucent particles color
+  sprite.opacity = 0.50; // translucent particles color
   sprite.material.color.setHSL(hue, 0.9, 0.7 );
   //sprite.material.NoColor;
 };

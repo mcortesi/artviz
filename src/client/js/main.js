@@ -33,7 +33,7 @@ function init()
   camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
   scene.add(camera);
 
-  camera.position.set(0,300,800);
+  camera.position.set(0,900,800);
   camera.lookAt(scene.position);
 
   // RENDERER
