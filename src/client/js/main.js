@@ -33,7 +33,7 @@ function init()
   camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
   scene.add(camera);
 
-  camera.position.set(0,150,400);
+  camera.position.set(0,300,800);
   camera.lookAt(scene.position);
 
   // RENDERER
@@ -138,7 +138,7 @@ function animate()
 
 function update()
 {
-  var dt = clock.getDelta() * 0.5;
+  var dt = clock.getDelta();
   tweetConstelation.update(dt);
 
   //var time = 4 * clock.getElapsedTime();
