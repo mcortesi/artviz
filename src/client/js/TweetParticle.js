@@ -6,6 +6,32 @@ function debug() {
   }
 }
 
+var Parameters =  {
+  MaxSupportedTPS: 100,
+  textHue: 0.1,
+  photoHue: 0.5,
+  videoHue: 0.9,
+  TweetLife: 6, //seconds
+  SphereRadius: 100,
+  explode: function() {alert("hola")}
+};
+
+
+window.onload = function() {
+  var gui = new dat.GUI();
+  gui.remember(Parameters);
+
+  gui.add(Parameters, 'textHue', 0, 1);
+  gui.add(Parameters, 'photoHue', 0, 1);
+  gui.add(Parameters, 'videoHue', 0, 1);
+  gui.add(Parameters, 'TweetLife');
+  gui.add(Parameters, 'SphereRadius');
+  gui.add(Parameters, 'explode');
+
+
+}
+
+
 function randInt(min,max){
   var range = max - min;
   // it actually does work the other way...
@@ -26,13 +52,6 @@ function parseTweet(tweet) {
   }
 }
 
-var Constants = {
-  TweetLife: 6, //seconds
-  SphereRadius: 100,
-  MaxSupportedTPS: 100,
-
-}
-
 function TweetParticle(tweet, sprite) {
   this._listeners = [];
 
@@ -41,7 +60,7 @@ function TweetParticle(tweet, sprite) {
   this.sprite = sprite;
 
   sprite.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
-  sprite.position.setLength( Constants.SphereRadius * (Math.random() * 0.1 + 0.9) );
+  sprite.position.setLength( Parameters.SphereRadius * (Math.random() * 0.1 + 0.9) );
 
   this.startPosition = sprite.position.clone()
   this.randomness = Math.random();
@@ -53,14 +72,14 @@ function TweetParticle(tweet, sprite) {
   sprite.visible = true;
 
   this.age = 0;
-  this.maxAge = Constants.TweetLife;
+  this.maxAge = Parameters.TweetLife;
 }
 
 TweetParticle.prototype.setSpriteColor = function(sprite) {
   var hueMap = {
-    'text': 0.1,
-    'photo': 0.5,
-    'video': 0.9
+    'text': Parameters.textHue,
+    'photo': Parameters.photoHue,
+    'video': Parameters.videoHue
   }
 
   var hue = hueMap[this.tweet.contentType];
@@ -109,7 +128,7 @@ TweetParticle.prototype.toString = function() {
 }
 
 function TweetConstelation(scene) {
-  this.maxTweets = Constants.MaxSupportedTPS * Constants.TweetLife;
+  this.maxTweets = Parameters.MaxSupportedTPS * Parameters.TweetLife;
 
   this.particleGroup = null;
 
