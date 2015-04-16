@@ -177,7 +177,6 @@ var TweetConstellation = (function() {
 
   TweetConstellation.prototype.parseTweet = function(tweet) {
     var parse = ('isRetweet' in tweet)? parseAugmentedTweet : parseRawTweet;
-    console.log(parse);
 
     return parse(tweet);
   }
