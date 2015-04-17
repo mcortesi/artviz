@@ -77,12 +77,18 @@ var Scene = (function () {
   }
 
   function addSkyMap(scene) {
+    var textureCube = THREEx.createTextureCube([
+      '/images/texture.png', '/images/texture.png',
+      '/images/texture.png', '/images/texture.png',
+      '/images/texture.png', '/images/texture.png',
+    ]);
     var mesh = THREEx.createSkymap({
-      textureCube: THREEx.createTextureCube('skybox'),
+      textureCube: textureCube,
       cubeW: 6000,
       cubeH: 6000,
       cubeD: 6000,
     });
+    
     scene.add( mesh );
   }
 
@@ -105,7 +111,7 @@ var Scene = (function () {
       var camera = setupCamera(scene, Screen);
       var renderer = createRenderer(Screen);
       
-      scene.fog = new THREE.Fog( 0x000000, 1, 4000 );
+      //scene.fog = new THREE.Fog( 0x000000, 1, 5000 );
 
       // Extension Setup
       THREEx.WindowResize(renderer, camera);
@@ -116,7 +122,7 @@ var Scene = (function () {
       controls.minDistance = 1000;
       controls.maxDistance = 4500;
       controls.autoRotate = true;
-      controls.autoRotateSpeed = 1.2; // 30 seconds per round when fps is 60
+      controls.autoRotateSpeed = 0.4; // 30 seconds per round when fps is 60
 
 
       addLight(scene);
