@@ -41,7 +41,7 @@ var Parameters =  {
   photoHue: 0.5,
   videoHue: 0.9,
   TweetLife: 6, //seconds
-  SphereRadius: 600,
+  SphereRadius: 2000,
   PulseFactor: 4,
   RTAgeIncrease: 1,
   RotationSpeed: 0.5,

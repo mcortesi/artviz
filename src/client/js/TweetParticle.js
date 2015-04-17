@@ -167,7 +167,7 @@ var TweetConstellation = (function() {
 
     shape.visible = true;
     shape.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
-    shape.position.setLength( Parameters.SphereRadius * (Math.random() * 0.1 + 0.9) );
+    shape.position.setLength( Parameters.SphereRadius * (Math.random() * 0.4 + 0.6) );
 
     //shape.material.map = Textures[this.tweet.contentType];
 
