@@ -108,7 +108,7 @@ var TweetConstellation = (function() {
     };
   }
 
-  var sizeScale = d3.scale.sqrt().domain([0, 10]).range([32*2, 32*4]);
+  var sizeScale = d3.scale.sqrt().domain([0, 10]).range([1, 3]);
 
   var TweenFactory = {
     onEnterTweet: function (shape) {
@@ -116,9 +116,8 @@ var TweetConstellation = (function() {
         .to({opacity: 1, scale: 1 }, Parameters.ParticleEnterTime)
         .easing(TWEEN.Easing.Exponential.In)
         .onUpdate(function updateSprite() {
-          var imageSize = sizeScale(this.scale);
           shape.material.opacity = this.opacity;
-          //shape.scale.set(imageSize, imageSize, 1.0 ); // imageWidth, imageHeight
+          shape.scale.set(this.scale, this.scale, this.scale);
           shape.material.needsUpdate = true;
         });
     },
@@ -135,11 +134,11 @@ var TweetConstellation = (function() {
       var fromSize = sizeScale(retweetsCount -1);
       var toSize = sizeScale(retweetsCount);
 
-      return new TWEEN.Tween({imageSize: fromSize})
-        .to({imageSize: toSize }, 0.5)
+      return new TWEEN.Tween({scale: fromSize})
+        .to({scale: toSize }, 0.5)
         .easing(TWEEN.Easing.Exponential.In)
         .onUpdate(function updateSprite() {
-          //shape.scale.set(this.imageSize, this.imageSize, 1.0 ); // imageWidth, imageHeight
+          shape.scale.set(this.scale, this.scale, this.scale);
         });
     },
 
@@ -233,8 +232,9 @@ var TweetConstellation = (function() {
   };
 
   function TweetConstellation(scene) {
-    this.maxTweets = Parameters.MaxSupportedTPS * Parameters.TweetLife;
+    this.maxTweets = 120;
     //this.maxTweets = 1;
+
     this.particleGroup = null;
     this.scene = scene;
     this.rotationSpeedFactor = 1;

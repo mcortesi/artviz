@@ -110,6 +110,7 @@ var Scene = (function () {
       THREEx.WindowResize(renderer, camera);
       THREEx.FullScreen.bindKey({charCode: 'm'.charCodeAt(0)});
       var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
       var stats = setupStats();
       controls.maxDistance = 6000;
       addLight(scene);
