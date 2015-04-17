@@ -52,9 +52,9 @@ var TweetConstellation = (function() {
         color: 0xCC0000,
         transparent: true
       });
-      var shape = THREE.SceneUtils.createMultiMaterialObject(
+      var shape = new THREE.Mesh(
         new THREE.IcosahedronGeometry( 40, 0 ), // radius, subdivisions
-        [material] );
+        material );
       shape.visible = false;
       pool.push(shape);
     }
@@ -69,9 +69,9 @@ var TweetConstellation = (function() {
         color: 0xCC0000,
         transparent: true,
       });
-      var shape = THREE.SceneUtils.createMultiMaterialObject(
+      var shape = new THREE.Mesh(
         new THREE.CubeGeometry(50, 50, 50, 1, 1, 1),
-        [material] );
+        material );
       shape.visible = false;
       pool.push(shape);
     }
@@ -85,9 +85,9 @@ var TweetConstellation = (function() {
         color: 0xCC0000,
         transparent: true,
       });
-      var shape = THREE.SceneUtils.createMultiMaterialObject(
+      var shape = new THREE.Mesh(
         new THREE.OctahedronGeometry( 50, 0 ),
-        [material] );
+        material );
       shape.visible = false;
       pool.push(shape);
     }
@@ -111,18 +111,18 @@ var TweetConstellation = (function() {
         .easing(TWEEN.Easing.Exponential.In)
         .onUpdate(function updateSprite() {
           var imageSize = sizeScale(this.scale);
-          shape.children[0].material.opacity = this.opacity;
+          shape.material.opacity = this.opacity;
           //shape.scale.set(imageSize, imageSize, 1.0 ); // imageWidth, imageHeight
-          shape.children[0].material.needsUpdate = true;
+          shape.material.needsUpdate = true;
         });
     },
     onLeaveTweet: function (shape) {
-      return new TWEEN.Tween({ opacity: shape.children[0].material.opacity })
+      return new TWEEN.Tween({ opacity: shape.material.opacity })
         .to({opacity: 0}, Parameters.ParticleLeaveTime)
         .easing(TWEEN.Easing.Exponential.Out)
         .onUpdate(function updateSprite() {
-          shape.children[0].material.opacity = this.opacity;
-          shape.children[0].material.needsUpdate = true;
+          shape.material.opacity = this.opacity;
+          shape.material.needsUpdate = true;
         });
     },
     onRetweet: function(shape, retweetsCount) {
@@ -166,8 +166,8 @@ var TweetConstellation = (function() {
 
     //shape.material.map = Textures[this.tweet.contentType];
 
-    shape.children[0].material.color.setHSL(Math.random(), 0.9, 0.8 );
-    shape.children[0].material.needsUpdate = true;
+    shape.material.color.setHSL(Math.random(), 0.9, 0.8 );
+    shape.material.needsUpdate = true;
 
     this.currentAction = TweenFactory.onEnterTweet(shape).onComplete(this._onTweenFinished.bind(this)).start(0);
     this.actionChain = [];
