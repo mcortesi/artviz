@@ -48,41 +48,35 @@ var TweetConstellation = (function() {
 
   var TweenFactory = {
     onEnterTweet: function (sprite) {
-      function updateSprite() {
-        var imageSize = sizeScale(this.scale);
-        sprite.material.opacity = this.opacity;
-        sprite.scale.set(imageSize, imageSize, 1.0 ); // imageWidth, imageHeight
-        sprite.material.needsUpdate = true;
-      }
-
       return new TWEEN.Tween({opacity: 0, scale: 0})
         .to({opacity: 1, scale: 1 }, Parameters.ParticleEnterTime)
         .easing(TWEEN.Easing.Exponential.In)
-        .onUpdate(updateSprite);
+        .onUpdate(function updateSprite() {
+          var imageSize = sizeScale(this.scale);
+          sprite.material.opacity = this.opacity;
+          sprite.scale.set(imageSize, imageSize, 1.0 ); // imageWidth, imageHeight
+          sprite.material.needsUpdate = true;
+        });
     },
     onLeaveTweet: function (sprite) {
-      function updateSprite() {
-        sprite.material.opacity = this.opacity;
-        sprite.material.needsUpdate = true;
-      }
-
       return new TWEEN.Tween({ opacity: sprite.material.opacity })
         .to({opacity: 0}, Parameters.ParticleLeaveTime)
         .easing(TWEEN.Easing.Exponential.Out)
-        .onUpdate(updateSprite);
+        .onUpdate(function updateSprite() {
+          sprite.material.opacity = this.opacity;
+          sprite.material.needsUpdate = true;
+        });
     },
     onRetweet: function(sprite, retweetsCount) {
       var fromSize = sizeScale(retweetsCount -1);
       var toSize = sizeScale(retweetsCount);
 
-      function updateSprite() {
-        sprite.scale.set(this.imageSize, this.imageSize, 1.0 ); // imageWidth, imageHeight
-      }
-
       return new TWEEN.Tween({imageSize: fromSize})
         .to({imageSize: toSize }, 0.5)
         .easing(TWEEN.Easing.Exponential.In)
-        .onUpdate(updateSprite);
+        .onUpdate(function updateSprite() {
+          sprite.scale.set(this.imageSize, this.imageSize, 1.0 ); // imageWidth, imageHeight
+        });
     },
 
     defaultTween: function(sprite) {
@@ -102,46 +96,35 @@ var TweetConstellation = (function() {
   };
 
   function TweetParticle(tweet, sprite) {
-    this._listeners = [];
-
     this.tweet = tweet;
-    this.retweetCount = 0;
     this.sprite = sprite;
+    this.age = 0;
+    this.maxAge = Parameters.TweetLife;
+    this.retweetCount = 0;
 
+    sprite.visible = true;
     sprite.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
     sprite.position.setLength( Parameters.SphereRadius * (Math.random() * 0.1 + 0.9) );
 
-    this.setTexture(sprite);
-    this.setSpriteColor(sprite);
+    sprite.material.map = Textures[this.tweet.contentType];
+    sprite.material.color.setHSL(Math.random(), 0.9, 0.8 );
+    sprite.material.needsUpdate = true;
 
-    sprite.visible = true;
-
-    this.age = 0;
-    this.maxAge = Parameters.TweetLife;
-    this.currentAction = TweenFactory.onEnterTweet(sprite).start(0);
+    this.currentAction = TweenFactory.onEnterTweet(sprite).onComplete(this._onTweenFinished.bind(this)).start(0);
+    this.actionChain = [];
     this.defaultTween = TweenFactory.defaultTween(sprite);
   }
-
-  TweetParticle.prototype.setTexture = function(sprite) {
-    var texture = Textures[this.tweet.contentType];
-    sprite.material.map = texture;
-    sprite.material.needsUpdate = true;
-  };
-
-  TweetParticle.prototype.setSpriteColor = function(sprite) {
-    sprite.material.color.setHSL(Math.random(), 0.9, 0.8 );
-  };
 
   TweetParticle.prototype.update = function(dt) {
     this.age += dt;
 
-    this.currentAction.update(this.age);
+    if (this.currentAction !== null) { this.currentAction.update(this.age) };
     this.defaultTween.update(this.age);
 
     if (this.age >= this.maxAge - Parameters.ParticleLeaveTime && !this.dying) {
       this.dying = true;
       var sprite = this.sprite;
-      this.currentAction.stop();
+      if (this.currentAction !== null) { this.currentAction.stop(); }
       this.currentAction = TweenFactory.onLeaveTweet(this.sprite)
         .onComplete(function () {
           sprite.visible = false;
@@ -151,24 +134,34 @@ var TweetConstellation = (function() {
     return this.age >= this.maxAge;
   };
 
+  TweetParticle.prototype._onTweenFinished = function() {
+    var nextAction = null;
+    if (this.actionChain.length > 0) {
+      console.log('transition to NEXT action');
+      nextAction = this.actionChain.shift();
+      nextAction.start(this.age);
+    }
+    this.currentAction = nextAction;
+  };
+
   TweetParticle.prototype.addRetweet = function(retweet) {
     this.retweetCount++;
     this.maxAge += Parameters.RTAgeIncrease;
 
-    this.sprite.material.color.setHSL(Math.random(), 0.9, 0.8 )
-
     console.log('new retweet');
+    var retweetTween = TweenFactory.onRetweet(this.sprite, this.retweetCount)
+      .onComplete(this._onTweenFinished.bind(this));
     if (this.dying) {
       console.log('dying stopped');
       this.currentAction.stop();
-      this.currentAction = TweenFactory.onRetweet(this.sprite, this.retweetCount);
+      this.currentAction = retweetTween.start(this.age);
       this.dying = false;
+    } else if (this.currentAction === null) {
+      this.currentAction = retweetTween;
     } else {
-      this.currentAction.chain(TweenFactory.onRetweet(this.sprite, this.retweetCount));
+      this.actionChain.push(retweetTween);
     }
   };
-
-
 
   TweetParticle.prototype.toString = function() {
     return "{tweet: " + this.tweet.id + " , retweets: " + this.retweetCount + ",age: " + this.age + ", maxAge: " + this.maxAge + "}";
@@ -192,7 +185,7 @@ var TweetConstellation = (function() {
     this.particleGroup = new THREE.Object3D();
     this.particlesPool = [];
     for (var i=0; i < this.maxTweets; i++) {
-      var spriteMaterial = new THREE.SpriteMaterial( { map: Textures['null'], useScreenCoordinates: false, color: 0xff0000, transparent: true, opacity: 0.5} );
+      var spriteMaterial = new THREE.SpriteMaterial( { map: Textures['text'], useScreenCoordinates: false, color: 0xff0000, transparent: true, opacity: 0.5} );
       var sprite = new THREE.Sprite( spriteMaterial );
       sprite.visible = false;
 
