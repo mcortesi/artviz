@@ -148,7 +148,7 @@ var TweetConstellation = (function() {
 
       return {
         update: function (age) {
-          var pulseFactor = Math.sin(randomness * Parameters.PulseFactor * age) * 0.1 + 0.9;
+          var pulseFactor = Math.sin(randomness * Parameters.PulseFactor * age) * AudioAnalyser.getPulse() + 0.9;
           shape.position.x = startPosition.x * pulseFactor;
           shape.position.y = startPosition.y * pulseFactor;
           shape.position.z = startPosition.z * pulseFactor;
@@ -232,7 +232,7 @@ var TweetConstellation = (function() {
   };
 
   function TweetConstellation(scene) {
-    this.maxTweets = 120;
+    this.maxTweets = Parameters.MaxSupportedTPS * Parameters.TweetLife;
     //this.maxTweets = 1;
 
     this.particleGroup = null;

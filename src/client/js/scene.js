@@ -2,6 +2,7 @@
  Based on 'Particles.html' example from Lee Stemkoski
  */
 
+
 var Scene = (function () {
   'use strict';
 
@@ -123,6 +124,8 @@ var Scene = (function () {
       //addSky(scene);
       addSkyMap(scene);
 
+
+
       var tweetConstellation = createTweetConstellation(scene);
 
 
@@ -130,6 +133,8 @@ var Scene = (function () {
         tweetConstellation: tweetConstellation,
         startAnimation: function () {
           var clock = new THREE.Clock();
+
+          //AudioAnalyser.start();
 
           function animationFrame() {
             requestAnimationFrame(animationFrame);
@@ -146,7 +151,7 @@ var Scene = (function () {
           animationFrame();
         }
       };
-    },
+    }
 
   };
 })();

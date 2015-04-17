@@ -18,6 +18,67 @@ var TweetListener = {
   }
 };
 
+var AudioAnalyser = (function createAudioAnalyser() {
+  var audio = document.getElementById('myAudio');
+  audio.loop = true;
+
+  var audioCtx = new AudioContext();
+  var analyser = audioCtx.createAnalyser();
+  var source =  audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+  analyser.fftSize = 64;
+
+  // frequencyBinCount tells you how many values you'll receive from the analyser
+  var frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+  return {
+    audio: audio,
+    analyser: analyser,
+    frequencyData: frequencyData,
+    paused: true,
+    pulseScale : d3.scale.sqrt().domain([2000, 6000]).range([0.1, 1.5]),
+
+    populateFrequencyData: function() {
+      this.analyser.getByteFrequencyData(this.frequencyData);
+    },
+
+    getFrequencySum: function() {
+      this.populateFrequencyData();
+      var sum = 0;
+      for(var i = 0; i < this.frequencyData.length; i++) {
+        sum += this.frequencyData[i];
+      }
+
+      return sum;
+    },
+    start: function() {
+      this.paused = false;
+      audio.play();
+    },
+    getPulse: function() {
+      if(this.paused) {
+        return 0.1;
+      } else {
+        return this.pulseScale(this.getFrequencySum());
+      }
+    },
+    pause: function() {
+      this.paused = true;
+      audio.pause();
+    },
+    toggle: function() {
+      if(this.paused) {
+        this.start();
+      } else {
+        this.pause();
+      }
+    }
+
+  }
+
+})();
+
 function start() {
   'use strict';
 
@@ -47,7 +108,7 @@ var Parameters =  {
   RotationSpeed: 0.5,
   ParticleEnterTime: 1,
   ParticleLeaveTime: 0.5,
-  explode: function() {alert("hola")}
+  ToggleMusic: function() { AudioAnalyser.toggle();}
 };
 
 
@@ -66,9 +127,11 @@ window.onload = function() {
   gui.add(Parameters, 'RotationSpeed');
   gui.add(Parameters, 'ParticleEnterTime', 0.2, 2);
   gui.add(Parameters, 'ParticleLeaveTime', 0.5, 2);
-  gui.add(Parameters, 'explode');
+  gui.add(Parameters, 'ToggleMusic');
+
+  start();
 };
 
-start();
+
 
 
