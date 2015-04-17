@@ -102,13 +102,22 @@ var Parameters =  {
   photoHue: 0.5,
   videoHue: 0.9,
   TweetLife: 6, //seconds
-  SphereRadius: 3000,
+  SphereRadius: 800,
   PulseFactor: 3,
   RTAgeIncrease: 1,
   RotationSpeed: 0.5,
   ParticleEnterTime: 1,
   ParticleLeaveTime: 0.5,
-  ToggleMusic: function() { AudioAnalyser.toggle();}
+  ToggleMusic: function() { 
+    AudioAnalyser.toggle();
+    
+    if (AudioAnalyser.paused) {
+      Parameters.SphereRadius = 800;  
+    } else {
+      Parameters.SphereRadius = 600;
+    }
+    
+  }
 };
 
 

@@ -2,7 +2,8 @@
  Based on 'Particles.html' example from Lee Stemkoski
  */
 
-
+var Camera;
+var CameraTween;
 var Scene = (function () {
   'use strict';
 
@@ -12,7 +13,7 @@ var Scene = (function () {
       NEAR = 0.1,
       FAR = 20000;
 
-    var camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+    var camera = Camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
     scene.add(camera);
 
     camera.position.set(0, 0, 1500);
@@ -52,6 +53,11 @@ var Scene = (function () {
     var light = new THREE.PointLight(0xffffff);
     light.position.set(0, 450, 400);
     scene.add(light);
+
+    var dirlight = new THREE.DirectionalLight(0xffffff, .7);
+    dirlight.position.set(0, 0, 1000);
+    scene.add(dirlight);
+
   }
 
   function addFloor(scene) {
@@ -122,7 +128,7 @@ var Scene = (function () {
       controls.minDistance = 1000;
       controls.maxDistance = 4500;
       controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.4; // 30 seconds per round when fps is 60
+      controls.autoRotateSpeed = 0.8; // 30 seconds per round when fps is 60
 
 
       addLight(scene);
@@ -152,6 +158,9 @@ var Scene = (function () {
             controls.update();
 
             tweetConstellation.update(dt);
+            if (CameraTween) {
+              CameraTween.update();
+            }
           }
 
           animationFrame();
