@@ -112,7 +112,12 @@ var Scene = (function () {
       var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
       var stats = setupStats();
-      controls.maxDistance = 6000;
+      controls.minDistance = 1000;
+      controls.maxDistance = 4500;
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 1.2; // 30 seconds per round when fps is 60
+
+
       addLight(scene);
       //addFloor(scene);
       //addSky(scene);
