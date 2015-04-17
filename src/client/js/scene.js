@@ -49,7 +49,7 @@ var Scene = (function () {
 
   function addLight(scene) {
     var light = new THREE.PointLight(0xffffff);
-    light.position.set(0, 250, 400);
+    light.position.set(0, 450, 400);
     scene.add(light);
   }
 
@@ -103,6 +103,8 @@ var Scene = (function () {
       var scene = new THREE.Scene();
       var camera = setupCamera(scene, Screen);
       var renderer = createRenderer(Screen);
+      
+      scene.fog = new THREE.Fog( 0x000000, 1, 3000 );
 
       // Extension Setup
       THREEx.WindowResize(renderer, camera);

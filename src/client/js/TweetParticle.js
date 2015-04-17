@@ -50,7 +50,9 @@ var TweetConstellation = (function() {
     for (var i=0; i < poolSize; i++) {
       var material = new THREE.MeshPhongMaterial({
         color: 0xCC0000,
-        transparent: true
+        transparent: true,
+        shininess: 30,
+        shading: THREE.FlatShading
       });
       var shape = new THREE.Mesh(
         new THREE.IcosahedronGeometry( 40, 0 ), // radius, subdivisions
@@ -68,6 +70,8 @@ var TweetConstellation = (function() {
       var material = new THREE.MeshPhongMaterial({
         color: 0xCC0000,
         transparent: true,
+        shininess: 30,
+        shading: THREE.FlatShading
       });
       var shape = new THREE.Mesh(
         new THREE.CubeGeometry(50, 50, 50, 1, 1, 1),
@@ -84,6 +88,8 @@ var TweetConstellation = (function() {
       var material = new THREE.MeshPhongMaterial({
         color: 0xCC0000,
         transparent: true,
+        shininess: 30,
+        shading: THREE.FlatShading
       });
       var shape = new THREE.Mesh(
         new THREE.OctahedronGeometry( 50, 0 ),
