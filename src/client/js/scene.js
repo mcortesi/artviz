@@ -55,7 +55,7 @@ var Scene = (function () {
     scene.add(light);
 
     var dirlight = new THREE.DirectionalLight(0xffffff, .7);
-    dirlight.position.set(0, 0, 1000);
+    dirlight.position.set(0, 0, 3000);
     scene.add(dirlight);
 
   }
