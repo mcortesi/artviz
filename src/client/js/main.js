@@ -9,11 +9,12 @@ function debug() {
 }
 
 var TweetListener = {
-  start: function (onTweet) {
+  start: function (onTweet, onStats) {
     'use strict';
 
     var socket = io.connect('http://localhost:3000');
     socket.on('tweet', onTweet);
+    socket.on('stats', onStats);
   }
 };
 
@@ -22,9 +23,14 @@ function start() {
 
   var scene = Scene.setup();
 
-  TweetListener.start(function (newTweet) {
-    scene.tweetConstellation.addTweet(newTweet);
-  });
+  TweetListener.start(
+    function (newTweet) {
+      scene.tweetConstellation.addTweet(newTweet);
+    },
+    function(stats) {
+      console.log('TPM: ' + stats.tpm + ' - ' + 'TPS: ' + stats.tps)
+      scene.tweetConstellation.updateStreamStats(stats);
+    });
 
   scene.startAnimation();
 }

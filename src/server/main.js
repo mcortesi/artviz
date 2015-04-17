@@ -5,6 +5,8 @@ var io = require('socket.io')(server);
 var path = require('path');
 var request = require('request');
 var StreamListener = require('./StreamListener');
+var StreamStats = require('./StreamStats')
+
 var config = require('config');
 
 app.use(express.static(path.join(__dirname, '../client')));
@@ -12,7 +14,18 @@ app.use(express.static(path.join(__dirname, '../client')));
 
 var sockets = [];
 
+var streamStats = new StreamStats();
+
+setInterval(function() {
+  var stats = streamStats.getStats();
+  sockets.forEach(function(socket) {
+    socket.emit('stats', stats);
+  })
+}, 1000);
+
 StreamListener.start(function (tweet) {
+  streamStats.addTweet(tweet);
+
   if(!config.augment) {
     sockets.forEach(function (socket) {
       socket.emit('tweet', tweet);

@@ -231,6 +231,7 @@ var TweetConstellation = (function() {
     //this.maxTweets = 1;
     this.particleGroup = null;
     this.scene = scene;
+    this.rotationSpeedFactor = 1;
   }
 
   TweetConstellation.prototype.initParticlesPool = function() {
@@ -282,7 +283,7 @@ var TweetConstellation = (function() {
   };
 
   TweetConstellation.prototype.update = function(dt) {
-    this.particleGroup.rotation.y += dt * Parameters.RotationSpeed;
+    this.particleGroup.rotation.y += dt * Parameters.RotationSpeed * this.rotationSpeedFactor;
 
     var deadTweetIds = _(this.tweetParticles)
       .mapValues(function (tweetParticle) { return tweetParticle.update(dt); })
@@ -300,6 +301,11 @@ var TweetConstellation = (function() {
       delete self.tweetParticles[tweetId];
       self.particlesPool[tweetParticle.tweet.contentType].push(tweetParticle.shape);
     });
+  };
+
+  var rotationFactorScale = d3.scale.sqrt().domain([2000, 3000]).range([1, 5]);
+  TweetConstellation.prototype.updateStreamStats = function(stats) {
+    this.rotationSpeedFactor = rotationFactorScale(stats.tpm);
   };
 
   return TweetConstellation;
