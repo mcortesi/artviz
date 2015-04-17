@@ -14,7 +14,7 @@ var Scene = (function () {
     var camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
     scene.add(camera);
 
-    camera.position.set(0, 900, 800);
+    camera.position.set(0, 0, 500);
     camera.lookAt(scene.position);
 
     return camera;
@@ -75,6 +75,16 @@ var Scene = (function () {
     scene.add(skyBox);
   }
 
+  function addSkyMap(scene) {
+    var mesh = THREEx.createSkymap({
+      textureCube: THREEx.createTextureCube('skybox'),
+      cubeW: 6000,
+      cubeH: 6000,
+      cubeD: 6000,
+    });
+    scene.add( mesh );
+  }
+
   function createTweetConstellation(scene) {
     var tweetConstelation = new TweetConstellation(scene);
     tweetConstelation.initialize();
@@ -102,7 +112,8 @@ var Scene = (function () {
 
       addLight(scene);
       //addFloor(scene);
-      addSky(scene);
+      //addSky(scene);
+      addSkyMap(scene);
 
       var tweetConstellation = createTweetConstellation(scene);
 

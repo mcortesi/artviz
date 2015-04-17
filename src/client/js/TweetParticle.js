@@ -246,7 +246,7 @@ var TweetConstellation = (function() {
     this.particlesPool.photo.forEach(addToPool);
     this.particlesPool.video.forEach(addToPool);
 
-    this.particleGroup.position.y = 100;
+    //this.particleGroup.position.y = 100;
     this.scene.add(this.particleGroup);
   };
 

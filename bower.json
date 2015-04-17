@@ -22,11 +22,19 @@
     "dat-gui": "~0.5.1",
     "tweenjs": "*",
     "threex.keyboardstate": "*",
-    "threex.windowresize": "*"
+    "threex.windowresize": "*",
+    "threex.skymap": "*"
   },
   "overrides": {
     "dat-gui": {
       "main": "build/dat.gui.min.js"
+    },
+    "threex.skymap": {
+      "main": [
+        "threex.skymap.js",
+        "threex.texturecube.js",
+        "threex.cubetexturehcross.js"
+      ]
     }
   }
 }
