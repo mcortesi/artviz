@@ -83,6 +83,20 @@ var TweetConstellation = (function() {
         .to({imageSize: toSize }, 0.5)
         .easing(TWEEN.Easing.Exponential.In)
         .onUpdate(updateSprite);
+    },
+
+    defaultTween: function(sprite) {
+      var startPosition = sprite.position.clone();
+      var randomness = Math.random() + 1;
+
+      return {
+        update: function (age) {
+          var pulseFactor = Math.sin(randomness * Parameters.PulseFactor * age) * 0.1 + 0.9;
+          sprite.position.x = startPosition.x * pulseFactor;
+          sprite.position.y = startPosition.y * pulseFactor;
+          sprite.position.z = startPosition.z * pulseFactor;
+        }
+      };
     }
 
   };
@@ -97,9 +111,6 @@ var TweetConstellation = (function() {
     sprite.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
     sprite.position.setLength( Parameters.SphereRadius * (Math.random() * 0.1 + 0.9) );
 
-    this.startPosition = sprite.position.clone();
-    this.randomness = Math.random();
-
     this.setTexture(sprite);
     this.setSpriteColor(sprite);
 
@@ -108,6 +119,7 @@ var TweetConstellation = (function() {
     this.age = 0;
     this.maxAge = Parameters.TweetLife;
     this.currentAction = TweenFactory.onEnterTweet(sprite).start(0);
+    this.defaultTween = TweenFactory.defaultTween(sprite);
   }
 
   TweetParticle.prototype.setTexture = function(sprite) {
@@ -124,12 +136,7 @@ var TweetConstellation = (function() {
     this.age += dt;
 
     this.currentAction.update(this.age);
-
-    var a = this.randomness + 1;
-    var pulseFactor = Math.sin(a * Parameters.PulseFactor * this.age) * 0.1 + 0.9;
-    this.sprite.position.x = this.startPosition.x * pulseFactor;
-    this.sprite.position.y = this.startPosition.y * pulseFactor;
-    this.sprite.position.z = this.startPosition.z * pulseFactor;
+    this.defaultTween.update(this.age);
 
     if (this.age >= this.maxAge - Parameters.ParticleLeaveTime && !this.dying) {
       this.dying = true;
