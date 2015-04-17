@@ -37,7 +37,7 @@ var Parameters =  {
   TweetLife: 6, //seconds
   SphereRadius: 600,
   PulseFactor: 1,
-  RTAgeIncrease: 0.5,
+  RTAgeIncrease: 1,
   RotationSpeed: 0.5,
   ParticleEnterTime: 1,
   ParticleLeaveTime: 0.5,

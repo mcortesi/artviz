@@ -49,7 +49,7 @@ var Scene = (function () {
 
   function addLight(scene) {
     var light = new THREE.PointLight(0xffffff);
-    light.position.set(0, 250, 0);
+    light.position.set(0, 250, 400);
     scene.add(light);
   }
 
