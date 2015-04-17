@@ -14,7 +14,7 @@ var Scene = (function () {
     var camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
     scene.add(camera);
 
-    camera.position.set(0, 0, 500);
+    camera.position.set(0, 0, 1500);
     camera.lookAt(scene.position);
 
     return camera;
@@ -104,7 +104,7 @@ var Scene = (function () {
       var camera = setupCamera(scene, Screen);
       var renderer = createRenderer(Screen);
       
-      scene.fog = new THREE.Fog( 0x000000, 1, 3000 );
+      scene.fog = new THREE.Fog( 0x000000, 1, 4000 );
 
       // Extension Setup
       THREEx.WindowResize(renderer, camera);
