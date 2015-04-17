@@ -1,5 +1,5 @@
 
-var DEBUG_ENABLED = false;
+var DEBUG_ENABLED = true;
 
 function debug() {
   'use strict';
