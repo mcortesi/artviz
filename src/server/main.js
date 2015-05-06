@@ -12,6 +12,13 @@ var config = require('config');
 app.use(express.static(path.join(__dirname, '../client')));
 
 
+function fakeTweet() {
+  return {
+    id_str: new Date().getTime().toString(),
+    retweeted_status: undefined
+  };
+}
+
 var sockets = [];
 
 var streamStats = new StreamStats();
@@ -23,37 +30,49 @@ setInterval(function() {
   })
 }, 1000);
 
-StreamListener.start(function (tweet) {
-  streamStats.addTweet(tweet);
+if(config.realData) {
+  StreamListener.start(function (tweet) {
+    console.log(tweet);
+    streamStats.addTweet(tweet);
 
-  if(!config.augment) {
+    if(!config.augment) {
+      sockets.forEach(function (socket) {
+        socket.emit('tweet', tweet);
+      });
+    } else {
+      var options = {
+        url: config.augmentUrl,
+        headers: {
+          'Content-Type': 'text/plain'
+        },
+        body: tweet,
+        json: true
+      };
+
+      request.post(options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+          sockets.forEach(function (socket) {
+            socket.emit('tweet', body);
+          });
+        } else {
+          console.log(error);
+          console.log(response);
+        }
+      })
+    }
+
+  });
+} else {
+  setInterval(function() {
+    var tweet = fakeTweet();
+    console.log(tweet);
+    streamStats.addTweet(tweet);
     sockets.forEach(function (socket) {
       socket.emit('tweet', tweet);
     });
-  } else {
-    var options = {
-      url: config.augmentUrl,
-      headers: {
-        'Content-Type': 'text/plain'
-      },
-      body: tweet,
-      json: true
-    };
+  }, 100)
+}
 
-    request.post(options, function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-        sockets.forEach(function (socket) {
-          socket.emit('tweet', body);
-        });
-      } else {
-        console.log(error);
-        console.log(response);
-      }
-    })
-  }
-
-
-});
 
 io.on('connection', function (socket) {
   sockets.push(socket);
